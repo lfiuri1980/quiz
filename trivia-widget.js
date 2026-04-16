@@ -26,9 +26,7 @@ class TriviaWidget extends HTMLElement {
       animateQuestion: false,
       pointAward: 0,
       animatedDiscarded: new Set(),
-      streakProgress: 0,
-      streakBonus: 0,
-      consecutiveCorrect: 0,
+      streak: 0,
       bestStreak: 0,
     };
     this.timerId = null;
@@ -90,9 +88,7 @@ class TriviaWidget extends HTMLElement {
         animateQuestion: false,
         pointAward: 0,
         animatedDiscarded: new Set(),
-        streakProgress: 0,
-        streakBonus: 0,
-        consecutiveCorrect: 0,
+        streak: 0,
         bestStreak: 0,
       };
       this.render();
@@ -150,10 +146,6 @@ class TriviaWidget extends HTMLElement {
     return this.state.questions[this.state.current];
   }
 
-  maxPossibleScore() {
-    return this.state.questions.length * 15 + Math.floor(this.state.questions.length / 3) * 5;
-  }
-
   selectOption(index) {
     if (this.state.selected !== null || this.state.discarded.has(index)) return;
 
@@ -161,21 +153,17 @@ class TriviaWidget extends HTMLElement {
     const question = this.currentQuestion();
     const isCorrect = index === question.correctIndex;
     const pointAward = isCorrect ? Math.max(this.state.timeLeft, 0) : 0;
-    const consecutiveCorrect = isCorrect ? this.state.consecutiveCorrect + 1 : 0;
-    const nextStreakProgress = isCorrect ? this.state.streakProgress + 1 : 0;
-    const streakBonus = nextStreakProgress === 3 ? 5 : 0;
+    const streak = isCorrect ? this.state.streak + 1 : 0;
     const results = [...this.state.results];
     results[this.state.current] = isCorrect;
 
     this.setState({
       selected: index,
-      score: this.state.score + pointAward + streakBonus,
+      score: this.state.score + pointAward,
       results,
       pointAward,
-      streakProgress: nextStreakProgress,
-      streakBonus,
-      consecutiveCorrect,
-      bestStreak: Math.max(this.state.bestStreak, consecutiveCorrect),
+      streak,
+      bestStreak: Math.max(this.state.bestStreak, streak),
     });
   }
 
@@ -212,7 +200,7 @@ class TriviaWidget extends HTMLElement {
         new CustomEvent("trivia-finished", {
           detail: {
             score: this.state.score,
-            total: this.maxPossibleScore(),
+            total: this.state.questions.length * 15,
             totalQuestions: this.state.questions.length,
           },
           bubbles: true,
@@ -231,8 +219,6 @@ class TriviaWidget extends HTMLElement {
       animateQuestion: true,
       pointAward: 0,
       animatedDiscarded: new Set(),
-      streakProgress: this.state.streakProgress >= 3 ? 0 : this.state.streakProgress,
-      streakBonus: 0,
     });
     this.startTimer();
   }
@@ -253,9 +239,7 @@ class TriviaWidget extends HTMLElement {
       animateQuestion: false,
       pointAward: 0,
       animatedDiscarded: new Set(),
-      streakProgress: 0,
-      streakBonus: 0,
-      consecutiveCorrect: 0,
+      streak: 0,
       bestStreak: 0,
     });
     this.startTimer();
@@ -303,15 +287,7 @@ class TriviaWidget extends HTMLElement {
     this.stopTimer();
     const results = [...this.state.results];
     results[this.state.current] = "timeout";
-    this.setState({
-      selected: -1,
-      timeLeft: 0,
-      results,
-      pointAward: 0,
-      streakProgress: 0,
-      streakBonus: 0,
-      consecutiveCorrect: 0,
-    });
+    this.setState({ selected: -1, timeLeft: 0, results, pointAward: 0, streak: 0 });
   }
 
   updateTimerUI(ratio = Math.max(this.state.timeLeft, 0) / 15, secondsLeft = this.state.timeLeft) {
@@ -379,12 +355,6 @@ class TriviaWidget extends HTMLElement {
     }
 
     return `<span class="trivia-point-bubble" aria-label="Puntos obtenidos">+${this.state.pointAward}</span>`;
-  }
-
-  streakSegments() {
-    return [1, 2, 3]
-      .map((segment) => `<span class="${this.state.streakProgress >= segment ? "is-filled" : ""}"></span>`)
-      .join("");
   }
 
   iconUrl(fileName) {
@@ -486,7 +456,7 @@ class TriviaWidget extends HTMLElement {
     }
 
     if (this.state.finished) {
-      const total = this.maxPossibleScore();
+      const total = this.state.questions.length * 15;
       const percentage = Math.round((this.state.score / total) * 100);
       return `
         <section class="trivia-shell trivia-results" aria-live="polite">
@@ -517,27 +487,23 @@ class TriviaWidget extends HTMLElement {
           <span class="trivia-time-track trivia-time-track-left">
             <span class="trivia-time-bar trivia-time-bar-left" data-time-bar style="transform: scaleX(${timeRatio})"></span>
           </span>
-          <span class="trivia-time-wrap">
-            <span class="trivia-streak-meter" aria-label="Racha: ${Math.min(this.state.streakProgress, 3)} de 3">
-              ${this.streakSegments()}
-            </span>
-            <span class="trivia-time-ring" data-time-ring style="--time-angle: ${timeAngle}">
-              <span data-time-number>${this.state.timeLeft}</span>
-            </span>
-            ${
-              this.state.streakBonus
-                ? `<span class="trivia-streak-toast">Racha alcanzada <strong>+${this.state.streakBonus}</strong></span>`
-                : ""
-            }
+          <span class="trivia-time-ring" data-time-ring style="--time-angle: ${timeAngle}">
+            <span data-time-number>${this.state.timeLeft}</span>
           </span>
           <span class="trivia-time-track trivia-time-track-right">
             <span class="trivia-time-bar trivia-time-bar-right" data-time-bar style="transform: scaleX(${timeRatio})"></span>
           </span>
         </div>
 
-        <div class="trivia-live-score" aria-label="Puntaje en vivo">
-          <span>Puntos</span>
-          <strong>${this.state.score}</strong>
+        <div class="trivia-live-stats" aria-label="Marcador en vivo">
+          <div>
+            <span>Puntos</span>
+            <strong>${this.state.score}</strong>
+          </div>
+          <div class="${this.state.streak >= 2 ? "is-hot" : ""}">
+            <span>Racha</span>
+            <strong>${this.state.streak}</strong>
+          </div>
         </div>
 
         <article class="trivia-question ${this.state.animateQuestion ? "is-entering" : ""}" data-transition="${this.state.transitionKey}">
@@ -817,76 +783,6 @@ class TriviaWidget extends HTMLElement {
         width: 74px;
       }
 
-      .trivia-time-wrap {
-        display: inline-flex;
-        position: relative;
-      }
-
-      .trivia-streak-meter {
-        height: 54px;
-        left: 50%;
-        pointer-events: none;
-        position: absolute;
-        top: -12px;
-        transform: translateX(-50%);
-        width: 96px;
-        z-index: 2;
-      }
-
-      .trivia-streak-meter span {
-        border-top: 5px solid #dce1e2;
-        border-radius: 999px;
-        display: block;
-        height: 20px;
-        position: absolute;
-        transition: border-color 260ms ease, transform 260ms ease;
-        width: 27px;
-      }
-
-      .trivia-streak-meter span:nth-child(1) {
-        left: 13px;
-        top: 24px;
-        transform: rotate(-40deg);
-      }
-
-      .trivia-streak-meter span:nth-child(2) {
-        left: 34px;
-        top: 8px;
-        width: 28px;
-      }
-
-      .trivia-streak-meter span:nth-child(3) {
-        right: 13px;
-        top: 24px;
-        transform: rotate(40deg);
-      }
-
-      .trivia-streak-meter span.is-filled {
-        border-color: #30C1E2;
-      }
-
-      .trivia-streak-toast {
-        animation: triviaStreakToast 1200ms ease-out both;
-        background: #213034;
-        border-radius: 999px;
-        color: #ffffff;
-        font-size: 0.72rem;
-        font-weight: 800;
-        left: 50%;
-        line-height: 1;
-        padding: 7px 9px;
-        pointer-events: none;
-        position: absolute;
-        top: calc(100% + 8px);
-        transform: translateX(-50%);
-        white-space: nowrap;
-        z-index: 3;
-      }
-
-      .trivia-streak-toast strong {
-        color: #30C1E2;
-      }
-
       .trivia-time-ring::after {
         border: 1px solid rgba(33, 48, 52, 0.1);
         border-radius: inherit;
@@ -903,25 +799,46 @@ class TriviaWidget extends HTMLElement {
         --timer-ring-color: #ff5342;
       }
 
-      .trivia-live-score {
+      .trivia-live-stats {
         align-items: center;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 8px 0 6px;
+      }
+
+      .trivia-live-stats > div {
+        align-items: center;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(33, 48, 52, 0.1);
+        border-radius: 999px;
         color: #4f5c5f;
         display: inline-flex;
         gap: 7px;
-        justify-content: center;
-        margin: 7px auto 2px;
-        width: 100%;
+        min-height: 30px;
+        padding: 6px 10px;
       }
 
-      .trivia-live-score span {
+      .trivia-live-stats span {
         font-size: 0.72rem;
         font-weight: 700;
       }
 
-      .trivia-live-score strong {
+      .trivia-live-stats strong {
         color: #213034;
-        font-size: 0.92rem;
+        font-size: 0.9rem;
         font-weight: 800;
+        line-height: 1;
+      }
+
+      .trivia-live-stats .is-hot {
+        animation: triviaStreakPulse 520ms ease both;
+        border-color: rgba(48, 193, 226, 0.42);
+        color: #30C1E2;
+      }
+
+      .trivia-live-stats .is-hot strong {
+        color: #30C1E2;
       }
 
       .trivia-prompt {
@@ -1318,22 +1235,12 @@ class TriviaWidget extends HTMLElement {
         }
       }
 
-      @keyframes triviaStreakToast {
-        0% {
-          opacity: 0;
-          transform: translate(-50%, 6px) scale(0.92);
+      @keyframes triviaStreakPulse {
+        0%, 100% {
+          transform: scale(1);
         }
-        18% {
-          opacity: 1;
-          transform: translate(-50%, 0) scale(1);
-        }
-        72% {
-          opacity: 1;
-          transform: translate(-50%, 0) scale(1);
-        }
-        100% {
-          opacity: 0;
-          transform: translate(-50%, -14px) scale(0.96);
+        45% {
+          transform: scale(1.06);
         }
       }
 
@@ -1377,30 +1284,14 @@ class TriviaWidget extends HTMLElement {
           width: 64px;
         }
 
-        .trivia-streak-meter {
-          top: -10px;
-          width: 84px;
+        .trivia-live-stats {
+          gap: 8px;
+          margin: 8px 0 4px;
         }
 
-        .trivia-streak-meter span {
-          border-top-width: 4px;
-          width: 24px;
-        }
-
-        .trivia-streak-meter span:nth-child(1) {
-          left: 10px;
-          top: 22px;
-        }
-
-        .trivia-streak-meter span:nth-child(2) {
-          left: 30px;
-          top: 9px;
-          width: 24px;
-        }
-
-        .trivia-streak-meter span:nth-child(3) {
-          right: 10px;
-          top: 22px;
+        .trivia-live-stats > div {
+          min-height: 28px;
+          padding: 5px 9px;
         }
 
         .trivia-progress-wrap {
