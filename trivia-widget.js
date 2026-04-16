@@ -823,45 +823,46 @@ class TriviaWidget extends HTMLElement {
       }
 
       .trivia-streak-meter {
-        height: 92px;
+        height: 54px;
         left: 50%;
         pointer-events: none;
         position: absolute;
-        top: -9px;
+        top: -12px;
         transform: translateX(-50%);
-        width: 92px;
+        width: 96px;
         z-index: 2;
       }
 
       .trivia-streak-meter span {
-        --segment-color: #dce1e2;
-        background: conic-gradient(transparent 0deg, transparent 360deg);
-        border-radius: 50%;
+        border-top: 5px solid #dce1e2;
+        border-radius: 999px;
         display: block;
-        height: 100%;
-        left: 0;
-        mask: radial-gradient(circle, transparent 0 40px, #000 41px 45px, transparent 46px);
-        -webkit-mask: radial-gradient(circle, transparent 0 40px, #000 41px 45px, transparent 46px);
+        height: 20px;
         position: absolute;
-        top: 0;
-        transition: background 260ms ease;
-        width: 100%;
+        transition: border-color 260ms ease, transform 260ms ease;
+        width: 27px;
       }
 
       .trivia-streak-meter span:nth-child(1) {
-        background: conic-gradient(transparent 0deg 292deg, var(--segment-color) 292deg 330deg, transparent 330deg 360deg);
+        left: 13px;
+        top: 24px;
+        transform: rotate(-40deg);
       }
 
       .trivia-streak-meter span:nth-child(2) {
-        background: conic-gradient(var(--segment-color) 0deg 21deg, transparent 21deg 339deg, var(--segment-color) 339deg 360deg);
+        left: 34px;
+        top: 8px;
+        width: 28px;
       }
 
       .trivia-streak-meter span:nth-child(3) {
-        background: conic-gradient(transparent 0deg 30deg, var(--segment-color) 30deg 68deg, transparent 68deg 360deg);
+        right: 13px;
+        top: 24px;
+        transform: rotate(40deg);
       }
 
       .trivia-streak-meter span.is-filled {
-        --segment-color: #30C1E2;
+        border-color: #30C1E2;
       }
 
       .trivia-streak-toast {
@@ -1377,14 +1378,29 @@ class TriviaWidget extends HTMLElement {
         }
 
         .trivia-streak-meter {
-          height: 80px;
-          top: -8px;
-          width: 80px;
+          top: -10px;
+          width: 84px;
         }
 
         .trivia-streak-meter span {
-          mask: radial-gradient(circle, transparent 0 34px, #000 35px 39px, transparent 40px);
-          -webkit-mask: radial-gradient(circle, transparent 0 34px, #000 35px 39px, transparent 40px);
+          border-top-width: 4px;
+          width: 24px;
+        }
+
+        .trivia-streak-meter span:nth-child(1) {
+          left: 10px;
+          top: 22px;
+        }
+
+        .trivia-streak-meter span:nth-child(2) {
+          left: 30px;
+          top: 9px;
+          width: 24px;
+        }
+
+        .trivia-streak-meter span:nth-child(3) {
+          right: 10px;
+          top: 22px;
         }
 
         .trivia-progress-wrap {
