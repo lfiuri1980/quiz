@@ -382,8 +382,14 @@ class TriviaWidget extends HTMLElement {
   }
 
   streakSegments() {
-    return [1, 2, 3]
-      .map((segment) => `<span class="${this.state.streakProgress >= segment ? "is-filled" : ""}"></span>`)
+    const segments = [
+      "M 15 54 A 39 39 0 0 1 30 23",
+      "M 39 15 A 39 39 0 0 1 61 15",
+      "M 70 23 A 39 39 0 0 1 85 54",
+    ];
+
+    return segments
+      .map((path, index) => `<path d="${path}" class="${this.state.streakProgress > index ? "is-filled" : ""}"></path>`)
       .join("");
   }
 
@@ -518,9 +524,9 @@ class TriviaWidget extends HTMLElement {
             <span class="trivia-time-bar trivia-time-bar-left" data-time-bar style="transform: scaleX(${timeRatio})"></span>
           </span>
           <span class="trivia-time-wrap">
-            <span class="trivia-streak-meter" aria-label="Racha: ${Math.min(this.state.streakProgress, 3)} de 3">
+            <svg class="trivia-streak-meter" viewBox="0 0 100 100" aria-label="Racha: ${Math.min(this.state.streakProgress, 3)} de 3">
               ${this.streakSegments()}
-            </span>
+            </svg>
             <span class="trivia-time-ring" data-time-ring style="--time-angle: ${timeAngle}">
               <span data-time-number>${this.state.timeLeft}</span>
             </span>
@@ -823,45 +829,26 @@ class TriviaWidget extends HTMLElement {
       }
 
       .trivia-streak-meter {
-        height: 92px;
+        height: 98px;
         left: 50%;
         pointer-events: none;
         position: absolute;
-        top: -9px;
+        top: -12px;
         transform: translateX(-50%);
-        width: 92px;
+        width: 98px;
         z-index: 2;
       }
 
-      .trivia-streak-meter span {
-        --segment-color: #dce1e2;
-        background: conic-gradient(transparent 0deg, transparent 360deg);
-        border-radius: 50%;
-        display: block;
-        height: 100%;
-        left: 0;
-        mask: radial-gradient(circle, transparent 0 40px, #000 41px 45px, transparent 46px);
-        -webkit-mask: radial-gradient(circle, transparent 0 40px, #000 41px 45px, transparent 46px);
-        position: absolute;
-        top: 0;
-        transition: background 260ms ease;
-        width: 100%;
+      .trivia-streak-meter path {
+        fill: none;
+        stroke: #dce1e2;
+        stroke-linecap: round;
+        stroke-width: 6;
+        transition: stroke 260ms ease;
       }
 
-      .trivia-streak-meter span:nth-child(1) {
-        background: conic-gradient(transparent 0deg 292deg, var(--segment-color) 292deg 330deg, transparent 330deg 360deg);
-      }
-
-      .trivia-streak-meter span:nth-child(2) {
-        background: conic-gradient(var(--segment-color) 0deg 21deg, transparent 21deg 339deg, var(--segment-color) 339deg 360deg);
-      }
-
-      .trivia-streak-meter span:nth-child(3) {
-        background: conic-gradient(transparent 0deg 30deg, var(--segment-color) 30deg 68deg, transparent 68deg 360deg);
-      }
-
-      .trivia-streak-meter span.is-filled {
-        --segment-color: #30C1E2;
+      .trivia-streak-meter path.is-filled {
+        stroke: #30C1E2;
       }
 
       .trivia-streak-toast {
@@ -1377,14 +1364,13 @@ class TriviaWidget extends HTMLElement {
         }
 
         .trivia-streak-meter {
-          height: 80px;
-          top: -8px;
-          width: 80px;
+          height: 86px;
+          top: -11px;
+          width: 86px;
         }
 
-        .trivia-streak-meter span {
-          mask: radial-gradient(circle, transparent 0 34px, #000 35px 39px, transparent 40px);
-          -webkit-mask: radial-gradient(circle, transparent 0 34px, #000 35px 39px, transparent 40px);
+        .trivia-streak-meter path {
+          stroke-width: 5;
         }
 
         .trivia-progress-wrap {
