@@ -1,0 +1,42 @@
+{
+  "title": "Historia de los Mundiales de futbol",
+  "intro": "Diez preguntas sobre campeones, sedes, records y momentos historicos de la Copa del Mundo.",
+  "questions": [
+    {
+      "question": "¿Que pais gano el primer Mundial de futbol en 1930?",
+      "options": ["Argentina", "Uruguay", "Brasil", "Italia"],
+      "correctOption": 2,
+      "explanation": "Uruguay gano el Mundial de 1930 como local tras vencer 4-2 a Argentina en la final."
+    },
+    {
+      "question": "En que pais se jugo el Mundial de 1970?",
+      "options": ["Mexico", "Chile", "Argentina", "Espana"],
+      "correctOption": 1,
+      "explanation": "El Mundial de 1970 se disputo en Mexico y fue el primero transmitido en color para muchos paises."
+    },
+    {
+      "question": "Que seleccion gano el Mundial de 1986?",
+      "options": ["Alemania Federal", "Argentina", "Francia", "Italia"],
+      "correctOption": 2,
+      "explanation": "Argentina fue campeona en Mexico 1986, con Diego Maradona como figura central del torneo."
+    },
+    {
+      "question": "Quien es el maximo goleador historico de los Mundiales masculinos?",
+      "options": ["Ronaldo Nazario", "Gerd Muller", "Miroslav Klose", "Lionel Messi"],
+      "correctOption": 3,
+      "explanation": "Miroslav Klose marco 16 goles en Mundiales, superando el record de Ronaldo Nazario."
+    },
+    {
+      "question": "Que seleccion gano el Mundial de 1998?",
+      "options": ["Brasil", "Francia", "Croacia", "Paises Bajos"],
+      "correctOption": 2,
+      "explanation": "Francia gano su primer Mundial en 1998 al vencer 3-0 a Brasil en la final de Saint-Denis."
+    },
+    {
+      "question": "Que pais fue campeon del Mundial de 2010?",
+      "options": ["Espana", "Alemania", "Argentina", "Paises Bajos"],
+      "correctOption": 1,
+      "explanation": "Espana gano Sudafrica 2010 al vencer 1-0 a Paises Bajos con gol de Andres Iniesta."
+    }
+  ]
+}
