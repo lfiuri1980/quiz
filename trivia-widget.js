@@ -383,9 +383,9 @@ class TriviaWidget extends HTMLElement {
 
   streakSegments() {
     const segments = [
-      "M 15 54 A 39 39 0 0 1 30 23",
-      "M 39 15 A 39 39 0 0 1 61 15",
-      "M 70 23 A 39 39 0 0 1 85 54",
+      "M 17 52 A 38 38 0 0 1 29 31",
+      "M 42 17 A 38 38 0 0 1 58 17",
+      "M 71 31 A 38 38 0 0 1 83 52",
     ];
 
     return segments
