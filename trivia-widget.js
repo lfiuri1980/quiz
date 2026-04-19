@@ -26,6 +26,8 @@ class TriviaWidget extends HTMLElement {
       animateQuestion: false,
       pointAward: 0,
       animatedDiscarded: new Set(),
+      streak: 0,
+      multiplier: 1,
     };
     this.timerId = null;
     this.timerDuration = 15000;
@@ -86,6 +88,8 @@ class TriviaWidget extends HTMLElement {
         animateQuestion: false,
         pointAward: 0,
         animatedDiscarded: new Set(),
+        streak: 0,
+        multiplier: 1,
       };
       this.render();
       this.startTimer();
@@ -148,7 +152,22 @@ class TriviaWidget extends HTMLElement {
     this.stopTimer();
     const question = this.currentQuestion();
     const isCorrect = index === question.correctIndex;
-    const pointAward = isCorrect ? Math.max(this.state.timeLeft, 0) : 0;
+    
+    let nextStreak = this.state.streak;
+    let nextMultiplier = 1;
+
+    if (isCorrect) {
+      nextStreak += 1;
+      if (nextStreak >= 3) {
+        nextMultiplier = 2;
+      }
+    } else {
+      nextStreak = 0;
+    }
+
+    const baseAward = isCorrect ? Math.max(this.state.timeLeft, 0) : 0;
+    const pointAward = baseAward * nextMultiplier;
+
     const results = [...this.state.results];
     results[this.state.current] = isCorrect;
 
@@ -157,6 +176,8 @@ class TriviaWidget extends HTMLElement {
       score: this.state.score + pointAward,
       results,
       pointAward,
+      streak: nextStreak,
+      multiplier: nextMultiplier,
     });
   }
 
@@ -232,6 +253,8 @@ class TriviaWidget extends HTMLElement {
       animateQuestion: false,
       pointAward: 0,
       animatedDiscarded: new Set(),
+      streak: 0,
+      multiplier: 1,
     });
     this.startTimer();
   }
@@ -278,7 +301,7 @@ class TriviaWidget extends HTMLElement {
     this.stopTimer();
     const results = [...this.state.results];
     results[this.state.current] = "timeout";
-    this.setState({ selected: -1, timeLeft: 0, results, pointAward: 0 });
+    this.setState({ selected: -1, timeLeft: 0, results, pointAward: 0, streak: 0, multiplier: 1 });
   }
 
   updateTimerUI(ratio = Math.max(this.state.timeLeft, 0) / 15, secondsLeft = this.state.timeLeft) {
@@ -345,7 +368,8 @@ class TriviaWidget extends HTMLElement {
       return "";
     }
 
-    return `<span class="trivia-point-bubble" aria-label="Puntos obtenidos">+${this.state.pointAward}</span>`;
+    const isMultipliedClass = this.state.multiplier > 1 ? "is-multiplied" : "";
+    return `<span class="trivia-point-bubble ${isMultipliedClass}" aria-label="Puntos obtenidos">+${this.state.pointAward}</span>`;
   }
 
   iconUrl(fileName) {
@@ -474,7 +498,15 @@ class TriviaWidget extends HTMLElement {
 
     return `
       <section class="trivia-shell" aria-live="polite">
-        <div class="trivia-timer" data-timer aria-label="Tiempo restante: ${this.state.timeLeft} segundos">
+        <div class="trivia-streak-tracker ${this.state.multiplier > 1 ? 'is-active' : ''}">
+          <div class="trivia-streak-dots">
+            <span class="${this.state.streak >= 1 ? 'is-lit' : ''}" style="--icon-url: url('${this.iconUrl("fire-solid-full.svg")}')"></span>
+            <span class="${this.state.streak >= 2 ? 'is-lit' : ''}" style="--icon-url: url('${this.iconUrl("fire-solid-full.svg")}')"></span>
+            <span class="${this.state.streak >= 3 ? 'is-lit' : ''}" style="--icon-url: url('${this.iconUrl("fire-solid-full.svg")}')"></span>
+          </div>
+          <div class="trivia-streak-text">Racha x2</div>
+        </div>
+        <div class="trivia-timer ${this.state.multiplier > 1 ? 'is-streak' : ''}" data-timer aria-label="Tiempo restante: ${this.state.timeLeft} segundos">
           <span class="trivia-time-track trivia-time-track-left">
             <span class="trivia-time-bar trivia-time-bar-left" data-time-bar style="transform: scaleX(${timeRatio})"></span>
           </span>
@@ -737,6 +769,14 @@ class TriviaWidget extends HTMLElement {
         background: #ff5342;
       }
 
+      .trivia-timer.is-streak .trivia-time-bar-left {
+        background: linear-gradient(90deg, #FFC107, #FF9800);
+      }
+      
+      .trivia-timer.is-streak .trivia-time-bar-right {
+        background: linear-gradient(-90deg, #FFC107, #FF9800);
+      }
+
       .trivia-time-bar-left {
         transform-origin: right center;
       }
@@ -773,6 +813,12 @@ class TriviaWidget extends HTMLElement {
 
       .trivia-time-ring span {
         position: relative;
+      }
+
+      .trivia-timer.is-streak .trivia-time-ring {
+        background:
+          radial-gradient(circle, #ffffff 57%, transparent 58%),
+          conic-gradient(#FFC107 0deg, #FF9800 var(--time-angle), rgba(33, 48, 52, 0.11) var(--time-angle));
       }
 
       .trivia-timer.is-ending .trivia-time-ring {
@@ -1247,6 +1293,107 @@ class TriviaWidget extends HTMLElement {
           height: 20px;
           width: 20px;
         }
+      }
+
+      /* Streaks and Multipliers CSS */
+      .trivia-streak-tracker {
+        position: absolute;
+        top: 8px; /* Move slightly up to avoid timer on narrow screens */
+        right: 14px;
+        display: flex;
+        flex-direction: row-reverse; /* Text on left, dots on right automatically */
+        align-items: center;
+        z-index: 10;
+        pointer-events: none;
+      }
+      
+      .trivia-streak-dots {
+        display: flex;
+        gap: 3px;
+        align-items: center;
+      }
+      
+      .trivia-streak-dots span {
+        width: 18px; /* Reduced base size */
+        height: 22px;
+        background: #b9c1c3;
+        mask: var(--icon-url) center / contain no-repeat;
+        -webkit-mask: var(--icon-url) center / contain no-repeat;
+        transition: background 300ms ease, filter 300ms ease, transform 300ms ease, width 300ms ease, opacity 300ms ease, margin 300ms ease;
+      }
+      
+      .trivia-streak-dots span.is-lit {
+        background: #FF9800;
+        filter: drop-shadow(0 0 3px rgba(255, 152, 0, 0.4));
+        transform: scale(1.15);
+      }
+      
+      .trivia-streak-text {
+        font-size: 0.85rem; /* Slightly smaller */
+        font-weight: 800;
+        color: #FF9800;
+        background: rgba(255, 152, 0, 0.15);
+        border-radius: 999px;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: opacity 200ms ease, transform 200ms ease, max-width 200ms ease, padding 200ms ease, margin 200ms ease;
+        max-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        padding: 0;
+        margin: 0;
+      }
+      
+      /* Active state: natural flex collapse */
+      .trivia-streak-tracker.is-active .trivia-streak-dots span:nth-child(1),
+      .trivia-streak-tracker.is-active .trivia-streak-dots span:nth-child(3) {
+        width: 0;
+        opacity: 0;
+        transform: scale(0);
+        margin: 0;
+      }
+      
+      .trivia-streak-tracker.is-active .trivia-streak-dots span:nth-child(2) {
+        animation: triviaFlamePulseMerged 0.45s 300ms infinite alternate;
+      }
+      
+      .trivia-streak-tracker.is-active .trivia-streak-text {
+        opacity: 1;
+        transform: scale(1);
+        max-width: 120px;
+        padding: 4px 10px;
+        margin-right: 6px;
+        transition: opacity 400ms ease 150ms, transform 400ms ease 150ms, max-width 300ms ease, padding 300ms ease, margin 300ms ease;
+      }
+
+      @keyframes triviaFlamePulseMerged {
+        /* scale 1.15 fits with the state it was left in when lit */
+        0% { transform: scale(1.15); filter: drop-shadow(0 0 4px rgba(255, 152, 0, 0.5)); }
+        100% { transform: scale(1.35); filter: drop-shadow(0 0 10px rgba(255, 152, 0, 0.8)); }
+      }
+
+      @media (min-width: 600px) {
+        .trivia-streak-tracker {
+          top: 14px;
+        }
+        .trivia-streak-dots span {
+          width: 26px;
+          height: 30px;
+        }
+        .trivia-streak-text {
+          font-size: 0.95rem;
+        }
+        .trivia-streak-tracker.is-active .trivia-streak-text {
+          padding: 4px 12px;
+        }
+      }
+
+      .trivia-point-bubble.is-multiplied {
+        background: linear-gradient(135deg, #FF9800, #FFC107);
+        box-shadow: 0 10px 22px rgba(255, 152, 0, 0.32);
+        font-size: 1rem;
+        padding: 8px 12px;
+        right: 36px;
       }
     `;
   }

@@ -1,42 +1,66 @@
 {
-  "title": "Historia de los Mundiales de futbol",
-  "intro": "Diez preguntas sobre campeones, sedes, records y momentos historicos de la Copa del Mundo.",
+  "title": "Trivia Mundialista: Edicion 2026",
+  "intro": "Diez preguntas exclusivas sobre los datos, curiosidades y el nuevo formato de la Copa del Mundo 2026.",
   "questions": [
     {
-      "question": "¿Que pais gano el primer Mundial de futbol en 1930?",
-      "options": ["Argentina", "Uruguay", "Brasil", "Italia"],
+      "question": "¿Cual es el estadio elegido para albergar la gran Final del Mundial 2026?",
+      "options": ["SoFi Stadium (Los Angeles)", "MetLife Stadium (NY/NJ)", "Estadio Azteca (C. de Mexico)", "AT&T Stadium (Dallas)"],
       "correctOption": 2,
-      "explanation": "Uruguay gano el Mundial de 1930 como local tras vencer 4-2 a Argentina en la final."
+      "explanation": "La gran final se jugara el 19 de julio de 2026 en el MetLife Stadium de Nueva Jersey, hogar de los Giants y Jets."
     },
     {
-      "question": "En que pais se jugo el Mundial de 1970?",
-      "options": ["Mexico", "Chile", "Argentina", "Espana"],
-      "correctOption": 1,
-      "explanation": "El Mundial de 1970 se disputo en Mexico y fue el primero transmitido en color para muchos paises."
-    },
-    {
-      "question": "Que seleccion gano el Mundial de 1986?",
-      "options": ["Alemania Federal", "Argentina", "Francia", "Italia"],
+      "question": "¿Cuantas ciudades sede en total albergaran los partidos del torneo entre los tres paises?",
+      "options": ["12 ciudades", "16 ciudades", "20 ciudades", "24 ciudades"],
       "correctOption": 2,
-      "explanation": "Argentina fue campeona en Mexico 1986, con Diego Maradona como figura central del torneo."
+      "explanation": "El Mundial se jugara en 16 ciudades organizadoras: 11 en Estados Unidos, 3 en Mexico y 2 en Canada."
     },
     {
-      "question": "Quien es el maximo goleador historico de los Mundiales masculinos?",
-      "options": ["Ronaldo Nazario", "Gerd Muller", "Miroslav Klose", "Lionel Messi"],
+      "question": "¿Cual de los tres paises anfitriones organizara la Copa del Mundo masculina de la FIFA por primera vez?",
+      "options": ["Estados Unidos", "Mexico", "Canada", "Los tres ya fueron sede"],
       "correctOption": 3,
-      "explanation": "Miroslav Klose marco 16 goles en Mundiales, superando el record de Ronaldo Nazario."
+      "explanation": "Mientras que Estados Unidos y Mexico ya alojaron este megaevento en el pasado, este sera el debut de Canada."
     },
     {
-      "question": "Que seleccion gano el Mundial de 1998?",
-      "options": ["Brasil", "Francia", "Croacia", "Paises Bajos"],
+      "question": "¿Como estara estructurada la novedosa fase de grupos de este Mundial expandido?",
+      "options": ["16 grupos de 3 equipos", "12 grupos de 4 equipos", "8 grupos de 6 equipos", "10 grupos de 4 equipos y 1 de 8"],
       "correctOption": 2,
-      "explanation": "Francia gano su primer Mundial en 1998 al vencer 3-0 a Brasil en la final de Saint-Denis."
+      "explanation": "Finalmente, la FIFA aprobo un formato competitivo de 12 grupos de 4 equipos cada uno."
     },
     {
-      "question": "Que pais fue campeon del Mundial de 2010?",
-      "options": ["Espana", "Alemania", "Argentina", "Paises Bajos"],
+      "question": "¿Que nueva ronda de eliminacion directa debutara en la historia del torneo producto de la expansion?",
+      "options": ["Dieciseisavos de final", "Fase previa de clasificados", "Octavos de final con ida y vuelta", "Reclasificacion de consolacion"],
       "correctOption": 1,
-      "explanation": "Espana gano Sudafrica 2010 al vencer 1-0 a Paises Bajos con gol de Andres Iniesta."
+      "explanation": "Al clasificar 32 equipos (los 2 primeros de cada grupo y los 8 mejores terceros), el torneo iniciara su mata-mata en Dieciseisavos."
+    },
+    {
+      "question": "¿Aproximadamente cuanto durara el torneo completo (desde el partido inaugural hasta la final)?",
+      "options": ["30 dias", "34 dias", "39 dias", "45 dias"],
+      "correctOption": 3,
+      "explanation": "El torneo sera el mas largo de la historia moderna, con un cronograma que se extendera a lo largo de 39 dias."
+    },
+    {
+      "question": "¿Que paises son los anfitriones elegidos para el Mundial de 2026?",
+      "options": ["Estados Unidos, Canada y Mexico", "Mexico, Brasil y Argentina", "Estados Unidos y Canada", "Argentina, Uruguay y Paraguay"],
+      "correctOption": 1,
+      "explanation": "El Mundial 2026 es el primero en la historia en celebrarse conjuntamente en tres paises diferentes."
+    },
+    {
+      "question": "¿Cual es el numero inedito de selecciones que participaran en el Mundial de 2026?",
+      "options": ["32 selecciones", "40 selecciones", "48 selecciones", "64 selecciones"],
+      "correctOption": 3,
+      "explanation": "Por primera vez en la historia, el torneo se expande para contar con 48 equipos clasificados."
+    },
+    {
+      "question": "¿Cuantos partidos en total se jugaran durante el Mundial 2026 bajo el nuevo formato?",
+      "options": ["64 partidos", "80 partidos", "96 partidos", "104 partidos"],
+      "correctOption": 4,
+      "explanation": "El calendario se ha extendido para acomodar 104 partidos en total con un nuevo formato de 12 grupos."
+    },
+    {
+      "question": "¿En que historico estadio de Mexico se jugara uno de los partidos inaugurales del Mundial 2026?",
+      "options": ["Estadio Akron", "Estadio Azteca", "Estadio BBVA", "Estadio Olimpico Universitario"],
+      "correctOption": 2,
+      "explanation": "El Estadio Azteca hara historia al organizar partidos mundialistas por tercera vez (1970, 1986 y 2026)."
     }
   ]
 }
