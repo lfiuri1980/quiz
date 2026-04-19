@@ -27,6 +27,7 @@ class TriviaWidget extends HTMLElement {
       pointAward: 0,
       animatedDiscarded: new Set(),
       streak: 0,
+      bestStreak: 0,
       multiplier: 1,
     };
     this.timerId = null;
@@ -89,6 +90,7 @@ class TriviaWidget extends HTMLElement {
         pointAward: 0,
         animatedDiscarded: new Set(),
         streak: 0,
+        bestStreak: 0,
         multiplier: 1,
       };
       this.render();
@@ -177,6 +179,7 @@ class TriviaWidget extends HTMLElement {
       results,
       pointAward,
       streak: nextStreak,
+      bestStreak: Math.max(this.state.bestStreak, nextStreak),
       multiplier: nextMultiplier,
     });
   }
@@ -216,6 +219,10 @@ class TriviaWidget extends HTMLElement {
             score: this.state.score,
             total: this.state.questions.length * 15,
             totalQuestions: this.state.questions.length,
+            correct: this.state.results.filter((result) => result === true).length,
+            incorrect: this.state.results.filter((result) => result === false).length,
+            unanswered: this.state.results.filter((result) => result === 'timeout').length,
+            bestStreak: this.state.bestStreak,
           },
           bubbles: true,
           composed: true,
@@ -254,6 +261,7 @@ class TriviaWidget extends HTMLElement {
       pointAward: 0,
       animatedDiscarded: new Set(),
       streak: 0,
+      bestStreak: 0,
       multiplier: 1,
     });
     this.startTimer();
@@ -472,14 +480,24 @@ class TriviaWidget extends HTMLElement {
 
     if (this.state.finished) {
       const total = this.state.questions.length * 15;
-      const percentage = Math.round((this.state.score / total) * 100);
+      const percentage = total ? Math.round((this.state.score / total) * 100) : 0;
+      const correct = this.state.results.filter((result) => result === true).length;
+      const incorrect = this.state.results.filter((result) => result === false).length;
+      const unanswered = this.state.results.filter((result) => result === "timeout").length;
       return `
         <section class="trivia-shell trivia-results" aria-live="polite">
           <div class="trivia-kicker">Resultado final</div>
           <h2>${this.escapeHtml(this.state.title)}</h2>
           <div class="trivia-score">${this.state.score}<span> / ${total} pts</span></div>
           <p>Completaste la trivia con ${percentage}% de los puntos posibles.</p>
-          <button class="trivia-primary" type="button" data-restart>Jugar de nuevo</button>
+          <div class="trivia-final-stats" aria-label="Resumen de la trivia">
+            <span><strong>${this.state.score}</strong>Puntaje final</span>
+            <span><strong>${correct}</strong>Correctas</span>
+            <span><strong>${incorrect}</strong>Incorrectas</span>
+            <span><strong>${unanswered}</strong>Sin responder</span>
+            <span><strong>${this.state.bestStreak}</strong>Mejor racha</span>
+          </div>
+          <button class="trivia-primary" type="button" data-restart>Volver a jugar</button>
         </section>
       `;
     }
@@ -498,6 +516,7 @@ class TriviaWidget extends HTMLElement {
 
     return `
       <section class="trivia-shell" aria-live="polite">
+        <div class="trivia-live-score" aria-label="Puntaje acumulado"><span>Puntos</span><strong>${this.state.score}</strong></div>
         <div class="trivia-streak-tracker ${this.state.multiplier > 1 ? 'is-active' : ''}">
           <div class="trivia-streak-dots">
             <span class="${this.state.streak >= 1 ? 'is-lit' : ''}" style="--icon-url: url('${this.iconUrl("fire-solid-full.svg")}')"></span>
@@ -634,6 +653,31 @@ class TriviaWidget extends HTMLElement {
         overflow: hidden;
         padding: clamp(20px, 4vw, 32px);
         position: relative;
+      }
+
+      .trivia-live-score {
+        align-items: baseline;
+        color: #213034;
+        display: inline-flex;
+        gap: 6px;
+        left: clamp(16px, 3.2vw, 26px);
+        position: absolute;
+        top: clamp(14px, 3vw, 22px);
+      }
+
+      .trivia-live-score span {
+        color: #6a7779;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .trivia-live-score strong {
+        color: #213034;
+        font-size: 1.05rem;
+        font-weight: 800;
+        line-height: 1;
       }
 
       .trivia-kicker {
@@ -823,6 +867,7 @@ class TriviaWidget extends HTMLElement {
 
       .trivia-timer.is-ending .trivia-time-ring {
         --timer-ring-color: #ff5342;
+        animation: triviaTimerPulse 920ms ease-in-out infinite;
       }
 
       .trivia-prompt {
@@ -1134,8 +1179,37 @@ class TriviaWidget extends HTMLElement {
         margin: 20px 0 10px;
       }
 
+      .trivia-final-stats {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        margin: 22px auto 4px;
+      }
+
+      .trivia-final-stats span {
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(33, 48, 52, 0.1);
+        border-radius: 8px;
+        color: #6a7779;
+        display: flex;
+        flex-direction: column;
+        font-size: 0.72rem;
+        font-weight: 700;
+        gap: 3px;
+        justify-content: center;
+        min-height: 72px;
+        padding: 10px 8px;
+      }
+
+      .trivia-final-stats strong {
+        color: #213034;
+        font-size: 1.45rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+
       .trivia-results .trivia-primary {
-        margin-top: 14px;
+        margin-top: 18px;
       }
 
       .trivia-loading,
@@ -1148,6 +1222,17 @@ class TriviaWidget extends HTMLElement {
       .trivia-error strong {
         display: block;
         margin-bottom: 6px;
+      }
+
+      @keyframes triviaTimerPulse {
+        0%, 100% {
+          box-shadow: 0 0 0 0 rgba(255, 83, 66, 0.2);
+          transform: scale(1);
+        }
+        50% {
+          box-shadow: 0 0 0 7px rgba(255, 83, 66, 0.08);
+          transform: scale(1.035);
+        }
       }
 
       @keyframes triviaSlide {
@@ -1370,6 +1455,20 @@ class TriviaWidget extends HTMLElement {
         /* scale 1.15 fits with the state it was left in when lit */
         0% { transform: scale(1.15); filter: drop-shadow(0 0 4px rgba(255, 152, 0, 0.5)); }
         100% { transform: scale(1.35); filter: drop-shadow(0 0 10px rgba(255, 152, 0, 0.8)); }
+      }
+
+      @media (max-width: 560px) {
+        .trivia-final-stats {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .trivia-final-stats span:first-child {
+          grid-column: 1 / -1;
+        }
+
+        .trivia-live-score {
+          top: 12px;
+        }
       }
 
       @media (min-width: 600px) {
